@@ -1,7 +1,9 @@
+var location = require('device/location');
 var router = require('lib/router');
 var slice = require('lib/slice-array');
 var XHRPageLoader = require('lib/xhr-page-loader');
 var captureTransition = require('lib/capture-transition');
+var getOrigin = require('url/get-origin');
 
 function createXHRLoader (loader) {
   return function (done, url) {
@@ -11,7 +13,9 @@ function createXHRLoader (loader) {
         loader.apply(null, args);
         done();
       },
-      onerror: function () { router.replace(url, 'force'); }
+      onerror: function () {
+        replace(url, 'force');
+      }
     });
   };
 }
@@ -20,10 +24,22 @@ function visit (url, force) {
   router.go(url, !force);
 }
 
+function replace (url, force) {
+  router.replace(url, !force);
+}
+
 function onTransition (e) {
   var detail = e.detail;
   var url = detail && detail.url;
   if (!url) { return; }
+
+  var siteOrigin = getOrigin(location.href);
+  if (siteOrigin !== getOrigin(url)) { return; }
+
+  var causer = detail.causer;
+  if (causer) {
+    if (causer.hasAttribute('data-static-resource')) { return; }
+  }
 
   e.preventDefault();
   visit(url);
@@ -53,9 +69,7 @@ module.exports = {
     return this;
   },
   go: visit,
-  replace: function (url, force) {
-    router.replace(url, !force);
-  },
+  replace: replace,
   forward: router.forward,
   back: router.back
 };
