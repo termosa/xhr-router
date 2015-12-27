@@ -36,7 +36,7 @@ function onReady (callback, cancel) {
 
 function onDOMContentLoaded () {
   isReady = true;
-  document.removeEventListener(EVENT_LOAD, onDOMContentLoaded);
+  document.removeEventListener(EVENT_LOAD, onDOMContentLoaded, true);
   tick(observe);
 }
 

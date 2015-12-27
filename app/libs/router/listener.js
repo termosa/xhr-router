@@ -33,16 +33,16 @@ function onPopstate () {
 function subscribe () {
   if (isSubscribed) { return; }
   isSubscribed = true;
-  window.addEventListener('beforeunload', onUnload);
-  window.addEventListener('popstate', onPopstate);
+  window.addEventListener('beforeunload', onUnload, true);
+  window.addEventListener('popstate', onPopstate, true);
   onReady(onChange);
 }
 
 function unsubscribe () {
   if (!isSubscribed) { return; }
   isSubscribed = false;
-  window.removeEventListener('beforeunload', onUnload);
-  window.removeEventListener('popstate', onPopstate);
+  window.removeEventListener('beforeunload', onUnload, true);
+  window.removeEventListener('popstate', onPopstate, true);
   onReady(onChange, 'cancel');
 }
 
